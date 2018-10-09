@@ -10,7 +10,7 @@ if (require !== undefined && require.main === module) {
   const { BU } = require('base-util-jh');
 
   const controller = new Control();
-  controller.setControllerListDBS().then(dbsList => {
+  controller.setControllerListForDBS().then(dbsList => {
     // BU.CLI(dbsList);
   });
   // controller.selectMap();

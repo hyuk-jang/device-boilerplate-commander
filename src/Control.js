@@ -33,17 +33,17 @@ class Control {
     // });
 
     /** @type {DBS[]} */
-    this.controllerListDBS = [];
+    this.controllerListForDBS = [];
     /** @type {DBP[]} */
-    this.controllerListDBP = [];
+    this.controllerListForDBP = [];
   }
 
   /**
    * @desc Step 1
-   * Main Storage List를 초기화
+   * DBS 객체 목록 생성 및 구동
    * @param {dbInfo=} dbInfo
    */
-  async setControllerListDBS(dbInfo) {
+  async setControllerListForDBS(dbInfo) {
     dbInfo = dbInfo || this.config.dbInfo;
 
     // BU.CLI(dbInfo)
@@ -60,7 +60,7 @@ class Control {
       const controllerDBS = new DBS(_.assign(this.config, { uuid: mainInfo.uuid }));
       // 해당 DBS Main UUID 정의
       controllerDBS.mainUUID = mainInfo.uuid;
-      this.controllerListDBS.push(controllerDBS);
+      this.controllerListForDBS.push(controllerDBS);
     });
 
     // BU.CLIN(this.controllerListDBS);
@@ -68,11 +68,15 @@ class Control {
     // BU.CLIN(this.controllerListDBS);
 
     // DBS 초기화가 끝날떄까지 기다림
-    await Promise.map(this.controllerListDBS, controllerDBS =>
+    // this.controllerListDBS 객체 목록 순회
+    await Promise.map(this.controllerListForDBS, controllerDBS =>
       // BU.CLIN(controllerDBS);
       controllerDBS
+        // DBS에 정의된 UUID를 기준으로 DB.main Table UUID를 비교하여 DLC 객체를 생성하기 위한 DL 및 Node 객체 정의
         .getDataLoggerListByDB()
+        // 관련된 DLC 객체 목록을 생성
         .then(() => controllerDBS.init())
+        // DBS 객체 구동 시작
         .then(() => {
           controllerDBS.inquiryAllDeviceStatus();
           Promise.resolve();
@@ -82,7 +86,7 @@ class Control {
         }),
     );
 
-    return this.controllerListDBS;
+    return this.controllerListForDBS;
   }
 
   async selectMap() {
