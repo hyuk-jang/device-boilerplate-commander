@@ -1,7 +1,9 @@
+require('dotenv').config();
+
 const config = {
   mainSocketInfo: {
-    host: process.env.WEB_SOCKET_PORT,
     port: process.env.WEB_SOCKET_PORT,
+    wrapperCategory: 'default',
   },
   dbInfo: {
     port: process.env.WEB_DB_PORT ? process.env.WEB_DB_PORT : '3306',

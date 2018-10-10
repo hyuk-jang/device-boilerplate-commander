@@ -1,6 +1,8 @@
 const _ = require('lodash');
 const Promise = require('bluebird');
 
+const SocketServer = require('./SocketServer');
+
 const { BM } = require('../../base-model-jh');
 const { BU } = require('../../base-util-jh');
 
@@ -15,9 +17,13 @@ class Control {
   /**
    *
    * @param {dsmConfig} config
+   * @param {dbInfo=} dbInfo
    */
-  constructor(config) {
+  constructor(config, dbInfo) {
     this.config = config || dsmConfig;
+    dbInfo = dbInfo || this.config.dbInfo;
+
+    this.biModule = new BM(dbInfo);
 
     // this.biModule = new BM({
     //   /** 접속 주소 구동 */
@@ -41,14 +47,8 @@ class Control {
   /**
    * @desc Step 1
    * DBS 객체 목록 생성 및 구동
-   * @param {dbInfo=} dbInfo
    */
-  async setControllerListForDBS(dbInfo) {
-    dbInfo = dbInfo || this.config.dbInfo;
-
-    // BU.CLI(dbInfo)
-    this.biModule = new BM(dbInfo);
-
+  async setControllerListForDBS() {
     // DB에서 main 정보를 가져옴
     /** @type {MAIN[]} */
     let mainList = await this.biModule.getTable('main', { is_deleted: 0 });
@@ -78,7 +78,8 @@ class Control {
         .then(() => controllerDBS.init())
         // DBS 객체 구동 시작
         .then(() => {
-          controllerDBS.inquiryAllDeviceStatus();
+          controllerDBS.runDeviceInquiryScheduler();
+          // controllerDBS.inquiryAllDeviceStatus();
           Promise.resolve();
         })
         .catch(err => {
@@ -87,6 +88,19 @@ class Control {
     );
 
     return this.controllerListForDBS;
+  }
+
+  /**
+   * @desc Step 2
+   * Server 구동
+   */
+  async operationServer() {
+    // Socket Server 정보가 있다면 구동
+    if (!_.isEmpty(this.config.mainSocketInfo)) {
+      const socketServer = new SocketServer(this.config.mainSocketInfo, this.biModule);
+      await socketServer.setMainSiteUUIDList();
+      socketServer.createServer();
+    }
   }
 
   async selectMap() {
