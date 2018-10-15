@@ -19,9 +19,9 @@ class Control {
    * @param {dsmConfig} config
    * @param {dbInfo=} dbInfo
    */
-  constructor(config, dbInfo) {
-    this.config = config || dsmConfig;
-    dbInfo = dbInfo || this.config.dbInfo;
+  constructor(config = dsmConfig, dbInfo = config.dbInfo) {
+    this.config = config;
+    BU.CLI(dbInfo);
 
     this.biModule = new BM(dbInfo);
 
@@ -49,9 +49,10 @@ class Control {
    * DBS 객체 목록 생성 및 구동
    */
   async setControllerListForDBS() {
+    BU.CLI('setControllerListForDBS');
     // DB에서 main 정보를 가져옴
     /** @type {MAIN[]} */
-    let mainList = await this.biModule.getTable('main', { is_deleted: 0 });
+    let mainList = await this.biModule.getTable('main', { is_deleted: 0 }, false);
 
     // main Seq 순으로 정렬
     mainList = _.sortBy(mainList, 'main_seq');
@@ -78,7 +79,7 @@ class Control {
         .then(() => controllerDBS.init())
         // DBS 객체 구동 시작
         .then(() => {
-          controllerDBS.runDeviceInquiryScheduler();
+          // controllerDBS.runDeviceInquiryScheduler();
           // controllerDBS.inquiryAllDeviceStatus();
           Promise.resolve();
         })
@@ -95,6 +96,7 @@ class Control {
    * Server 구동
    */
   async operationServer() {
+    BU.CLI('operationServer');
     // Socket Server 정보가 있다면 구동
     if (!_.isEmpty(this.config.mainSocketInfo)) {
       const socketServer = new SocketServer(this.config.mainSocketInfo, this.biModule);

@@ -41,8 +41,8 @@ class SocketServer {
         let errorCount = 0;
 
         let strResUUID;
-        // 인증 요청 메시지 생성
-        const authMsg = BaseModel.defaultWrapper.wrapFrameMsg(protocolInfo, 'A');
+        // 인증 요청 메시지 생성 (default: 인증)
+        const authMsg = BaseModel.defaultWrapper.wrapFrameMsg(protocolInfo);
 
         // 인증 코드 요청 메시지 발송
         socket.write(authMsg);
@@ -65,7 +65,7 @@ class SocketServer {
 
           strResUUID = resUUID.toString();
 
-          BU.CLIS(resUUID, this.siteUUIDList);
+          BU.CLIS(strResUUID, this.siteUUIDList);
 
           // 해당 Site UUID가 존재한다면 Passive Client 등록
           if (_.includes(this.siteUUIDList, strResUUID)) {
@@ -86,6 +86,11 @@ class SocketServer {
               socket.end();
             }
           }
+        });
+
+        socket.on('close', () => {});
+        socket.on('error', () => {
+          socket.end();
         });
       })
       .on('error', err => {
