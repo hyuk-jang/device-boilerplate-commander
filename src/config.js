@@ -12,6 +12,6 @@ const config = {
     password: process.env.WEB_DB_PW ? process.env.WEB_DB_PW : 'test',
     database: process.env.WEB_DB_DB ? process.env.WEB_DB_DB : 'test',
   },
-  inquiryIntervalSecond: 60,
+  inquiryIntervalSecond: 10,
 };
 module.exports = config;

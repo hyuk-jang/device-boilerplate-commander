@@ -16,8 +16,8 @@ class SocketServer {
    * @param {mainSocketInfo} config
    * @param {BM} biModule
    */
-  constructor(config, biModule) {
-    this.config = config || mainSocketInfo;
+  constructor(config = mainSocketInfo, biModule) {
+    this.config = config;
     this.biModule = biModule;
     this.dcc = new DCC();
 
@@ -33,12 +33,14 @@ class SocketServer {
     };
     const server = net
       .createServer(socket => {
-        console.log(`client is Connected ${port}\n addressInfo: ${socket.remoteAddress}`);
+        console.log(`client is Connected ${port}\naddressInfo: ${socket.remoteAddress}`);
 
         // 인증 완료 여부
         let hasAuth = false;
         let bufDataStorage = Buffer.from('');
         let errorCount = 0;
+
+        let strResUUID;
         // 인증 요청 메시지 생성
         const authMsg = BaseModel.defaultWrapper.wrapFrameMsg(protocolInfo, 'A');
 
@@ -47,7 +49,7 @@ class SocketServer {
 
         // 3초안에 인증이 이루어지지 않는다면 해당 접속 해제
         const socketTimer = new CU.Timer(() => {
-          BU.CLI('socket.end')
+          BU.CLI(`${strResUUID} does not exist  `);
           socket.end();
         }, 3000);
 
@@ -61,26 +63,26 @@ class SocketServer {
           // 수신받은 데이터 Frame 제거
           const resUUID = BaseModel.defaultWrapper.peelFrameMsg(protocolInfo, data);
 
-          const strUUID = resUUID.toString();
+          strResUUID = resUUID.toString();
 
-          // BU.CLIS(resUUID, this.siteUUIDList);
+          BU.CLIS(resUUID, this.siteUUIDList);
 
           // 해당 Site UUID가 존재한다면 Passive Client 등록
-          if (_.includes(this.siteUUIDList, strUUID)) {
+          if (_.includes(this.siteUUIDList, strResUUID)) {
             hasAuth = true;
             // Timer 해제
             socketTimer.getStateRunning && socketTimer.pause();
             // Bindindg 처리
-            this.dcc.bindingPassiveClient(strUUID, socket);
+            this.dcc.bindingPassiveClient(strResUUID, socket);
           } else {
             // 에러 카운팅 증가
             errorCount += 1;
             // Stream 데이터로 인해 데이터의 짤림을 방지하기 위해 기회를 3번 줌
             if (errorCount > 2) {
-              BU.CLI('Auth Code Failed', strUUID);
+              BU.CLI('Auth Code Failed', strResUUID);
               // Timer 해제
               socketTimer.getStateRunning && socketTimer.pause();
-              BU.CLI('socket.end')
+              BU.CLI('socket.end');
               socket.end();
             }
           }
