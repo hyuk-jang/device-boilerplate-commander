@@ -58,7 +58,9 @@ class Control {
     mainList = _.sortBy(mainList, 'main_seq');
     // Main 정보 만큼 DBS List 생성
     mainList.forEach(mainInfo => {
-      const controllerDBS = new DBS(_.assign(this.config, { uuid: mainInfo.uuid }));
+      const cloneConfig = _.cloneDeep(this.config);
+      cloneConfig.uuid = mainInfo.uuid;
+      const controllerDBS = new DBS(cloneConfig);
       // 해당 DBS Main UUID 정의
       controllerDBS.mainUUID = mainInfo.uuid;
       this.controllerListForDBS.push(controllerDBS);
@@ -79,7 +81,7 @@ class Control {
         .then(() => controllerDBS.init())
         // DBS 객체 구동 시작
         .then(() => {
-          // controllerDBS.runDeviceInquiryScheduler();
+          controllerDBS.runDeviceInquiryScheduler();
           // controllerDBS.inquiryAllDeviceStatus();
           Promise.resolve();
         })
@@ -87,6 +89,15 @@ class Control {
           Promise.reject(err);
         }),
     );
+
+    // const wfk = _.map(this.controllerListForDBS, dl => {
+    //   const pickInfo = _.pick(dl.dataLoggerInfo, ['main_seq', 'm_name', 'dl_real_id']);
+    //   pickInfo.mainUUID = this.mainUUID;
+    //   return pickInfo;
+    // });
+    // BU.CLI(wfk)
+
+    // return this.config;
 
     return this.controllerListForDBS;
   }

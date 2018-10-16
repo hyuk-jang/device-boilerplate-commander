@@ -65,7 +65,7 @@ class SocketServer {
 
           strResUUID = resUUID.toString();
 
-          BU.CLIS(strResUUID, this.siteUUIDList);
+          // BU.CLIS(strResUUID, this.siteUUIDList);
 
           // 해당 Site UUID가 존재한다면 Passive Client 등록
           if (_.includes(this.siteUUIDList, strResUUID)) {
