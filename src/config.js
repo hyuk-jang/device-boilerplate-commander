@@ -1,7 +1,7 @@
 require('dotenv').config();
 
 const config = {
-  mainSocketInfo: {
+  createSocketServerInfo: {
     port: process.env.WEB_SOCKET_PORT,
     wrapperCategory: 'default',
   },
@@ -13,6 +13,6 @@ const config = {
     database: process.env.WEB_DB_DB || 'test',
   },
   inquiryIntervalSecond: 10,
-  inquiryWaitingSecond: 60,
+  inquiryWaitingSecond: 20,
 };
 module.exports = config;

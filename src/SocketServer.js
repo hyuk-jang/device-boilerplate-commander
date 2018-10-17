@@ -8,7 +8,7 @@ const DCC = require('../../device-client-controller-jh');
 
 const { BaseModel } = require('../../device-protocol-converter-jh');
 
-const { mainSocketInfo } = require('./config');
+const { createSocketServerInfo } = require('./config');
 
 class SocketServer {
   /**
@@ -16,7 +16,7 @@ class SocketServer {
    * @param {mainSocketInfo} config
    * @param {BM} biModule
    */
-  constructor(config = mainSocketInfo, biModule) {
+  constructor(config = createSocketServerInfo, biModule) {
     this.config = config;
     this.biModule = biModule;
     this.dcc = new DCC();

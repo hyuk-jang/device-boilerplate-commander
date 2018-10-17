@@ -8,7 +8,7 @@ const { BU } = require('../../base-util-jh');
 
 require('../../default-intelligence');
 
-const DBS = require('../../device-boilerplate-sensor/src/Control');
+const DBS = require('../../device-boilerplate-sensor');
 const DBP = require('../../device-boilerplate-power');
 
 const dsmConfig = require('./config');
@@ -38,6 +38,9 @@ class Control {
     //   database: 'FARM_PARALLEL',
     // });
 
+    /** @type {MAIN[]} */
+    this.siteList = [];
+
     /** @type {DBS[]} */
     this.controllerListForDBS = [];
     /** @type {DBP[]} */
@@ -50,14 +53,8 @@ class Control {
    */
   async setControllerListForDBS() {
     BU.CLI('setControllerListForDBS');
-    // DB에서 main 정보를 가져옴
-    /** @type {MAIN[]} */
-    let mainList = await this.biModule.getTable('main', { is_deleted: 0 }, false);
-
-    // main Seq 순으로 정렬
-    mainList = _.sortBy(mainList, 'main_seq');
     // Main 정보 만큼 DBS List 생성
-    mainList.forEach(mainInfo => {
+    this.siteList.forEach(mainInfo => {
       const cloneConfig = _.cloneDeep(this.config);
       cloneConfig.uuid = mainInfo.uuid;
       const controllerDBS = new DBS(cloneConfig);
@@ -102,6 +99,28 @@ class Control {
     return this.controllerListForDBS;
   }
 
+  /** MAIN DB Table을 가지고 오고 seq 순서대로 정렬 */
+  async setMainList() {
+    /** @type {MAIN[]} */
+    const siteList = await this.biModule.getTable('main', { is_deleted: 0 }, false);
+    this.siteList = _.sortBy(siteList, 'main_seq');
+    return this.siteList;
+  }
+
+  /**
+   * @desc Step 2
+   * DBS 객체 목록 생성 및 구동
+   */
+  async setControllerListForDBP() {
+    BU.CLI('setControllerListForDBP');
+
+    const dbpController = new DBP(_.cloneDeep(this.config));
+
+    const deviceControllerList = await dbpController.init(this.config.dbInfo);
+    dbpController.runDeviceInquiryScheduler();
+    return deviceControllerList;
+  }
+
   /**
    * @desc Step 2
    * Server 구동
@@ -109,8 +128,8 @@ class Control {
   async operationServer() {
     BU.CLI('operationServer');
     // Socket Server 정보가 있다면 구동
-    if (!_.isEmpty(this.config.mainSocketInfo)) {
-      const socketServer = new SocketServer(this.config.mainSocketInfo, this.biModule);
+    if (!_.isEmpty(this.config.createSocketServerInfo)) {
+      const socketServer = new SocketServer(this.config.createSocketServerInfo, this.biModule);
       await socketServer.setMainSiteUUIDList();
       socketServer.createServer();
     }

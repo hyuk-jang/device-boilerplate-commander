@@ -12,7 +12,9 @@ if (require !== undefined && require.main === module) {
 
   const controller = new Control(config);
   controller
-    .setControllerListForDBS()
+    .setMainList()
+    .then(() => controller.setControllerListForDBS())
+    .then(() => controller.setControllerListForDBP())
     .then(dbsList =>
       // BU.CLI(dbsList);
       controller.operationServer(),
