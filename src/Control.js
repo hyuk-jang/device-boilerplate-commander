@@ -25,19 +25,6 @@ class Control {
 
     this.biModule = new BM(dbInfo);
 
-    // this.biModule = new BM({
-    //   /** 접속 주소 구동 */
-    //   host: 'localhost',
-    //   /** user ID */
-    //   user: 'fp',
-    //   /** user password */
-    //   password: 'smsoftware',
-    //   /** 사용할 port */
-    //   port: 3306,
-    //   /** 사용할 database */
-    //   database: 'FARM_PARALLEL',
-    // });
-
     /** @type {MAIN[]} */
     this.siteList = [];
 
@@ -63,10 +50,6 @@ class Control {
       this.controllerListForDBS.push(controllerDBS);
     });
 
-    // BU.CLIN(this.controllerListDBS);
-    // this.controllerListDBS = [_.nth(this.controllerListDBS, 1)];
-    // BU.CLIN(this.controllerListDBS);
-
     // DBS 초기화가 끝날떄까지 기다림
     // this.controllerListDBS 객체 목록 순회
     await Promise.map(this.controllerListForDBS, controllerDBS =>
@@ -78,6 +61,8 @@ class Control {
         .then(() => controllerDBS.init())
         // DBS 객체 구동 시작
         .then(() => {
+          // Main Socket Server 접속 시작
+          controllerDBS.setSocketClient();
           controllerDBS.runDeviceInquiryScheduler();
           // controllerDBS.inquiryAllDeviceStatus();
           Promise.resolve();
@@ -135,23 +120,14 @@ class Control {
     }
   }
 
-  async selectMap() {
-    const result = await this.biModule.getTable('main_map');
+  // async selectMap() {
+  //   const result = await this.biModule.getTable('main_map');
 
-    const file = result[0];
-    const map = file.contents;
+  //   const file = result[0];
+  //   const map = file.contents;
 
-    const r = JSON.parse(map);
-    BU.CLI(r.drawInfo);
-  }
-
-  // TODO: SetDBP
-  SetDBP() {}
-
-  // TODO: SetDBS
-  SetDBS() {}
-
-  // TODO: ListenSocketServer
-  ListenSocketServer() {}
+  //   const r = JSON.parse(map);
+  //   BU.CLI(r.drawInfo);
+  // }
 }
 module.exports = Control;

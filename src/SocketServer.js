@@ -89,7 +89,8 @@ class SocketServer {
         });
 
         socket.on('close', () => {});
-        socket.on('error', () => {
+        socket.on('error', err => {
+          console.error(err)
           socket.end();
         });
       })
