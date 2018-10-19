@@ -4,7 +4,7 @@ const { controllerParserType } = require('../../default-intelligence').dccFlagMo
 
 const config = {
   createSocketServerInfo: {
-    port: process.env.WEB_SOCKET_PORT,
+    port: process.env.DBC_SOCKET_PORT,
     wrapperCategory: 'default',
   },
   dbInfo: {
@@ -15,8 +15,8 @@ const config = {
     database: process.env.WEB_DB_DB || 'test',
   },
   mainSocketInfo: {
-    host: process.env.WEB_HTTP_HOST,
-    port: process.env.WEB_HTTP_PORT,
+    host: process.env.WEB_HTTP_HOST || 'localhost',
+    port: process.env.WEB_SOCKET_PORT,
     type: 'socket',
     addConfigInfo: {
       parser: controllerParserType.socket.DELIMITER,
