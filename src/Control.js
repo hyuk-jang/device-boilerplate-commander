@@ -1,11 +1,10 @@
 const _ = require('lodash');
 const Promise = require('bluebird');
 
+const { BM } = require('base-model-jh');
+const { BU } = require('base-util-jh');
+
 const SocketServer = require('./SocketServer');
-
-const { BM } = require('../../base-model-jh');
-const { BU } = require('../../base-util-jh');
-
 require('../../default-intelligence');
 
 const DBS = require('../../device-boilerplate-sensor');

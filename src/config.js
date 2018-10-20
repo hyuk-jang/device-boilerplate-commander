@@ -14,16 +14,16 @@ const config = {
     password: process.env.WEB_DB_PW || 'test',
     database: process.env.WEB_DB_DB || 'test',
   },
-  mainSocketInfo: {
-    host: process.env.WEB_HTTP_HOST || 'localhost',
-    port: process.env.WEB_SOCKET_PORT,
-    type: 'socket',
-    addConfigInfo: {
-      parser: controllerParserType.socket.DELIMITER,
-      option: Buffer.from([0x04]),
-    },
-  },
-  inquiryIntervalSecond: 10,
-  inquiryWaitingSecond: 20,
+  // mainSocketInfo: {
+  //   host: process.env.WEB_HTTP_HOST || 'localhost',
+  //   port: process.env.WEB_SOCKET_PORT,
+  //   type: 'socket',
+  //   addConfigInfo: {
+  //     parser: controllerParserType.socket.DELIMITER,
+  //     option: Buffer.from([0x04]),
+  //   },
+  // },
+  inquiryIntervalSecond: 60,
+  inquiryWaitingSecond: 60,
 };
 module.exports = config;

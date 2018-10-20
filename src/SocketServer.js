@@ -63,7 +63,7 @@ class SocketServer {
           // 수신받은 데이터 Frame 제거
           const resUUID = BaseModel.defaultWrapper.peelFrameMsg(protocolInfo, data);
 
-          strResUUID = resUUID.toString();
+          strResUUID = !_.isUndefined(resUUID) && resUUID.toString();
 
           // BU.CLIS(strResUUID, this.siteUUIDList);
 
