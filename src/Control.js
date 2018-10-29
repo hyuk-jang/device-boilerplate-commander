@@ -61,7 +61,7 @@ class Control {
         // DBS 객체 구동 시작
         .then(() => {
           // Main Socket Server 접속 시작
-          controllerDBS.setSocketClient();
+          controllerDBS.setOptionFeature();
           controllerDBS.runDeviceInquiryScheduler();
           // controllerDBS.inquiryAllDeviceStatus();
           Promise.resolve();
