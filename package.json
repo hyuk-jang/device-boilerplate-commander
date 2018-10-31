@@ -18,7 +18,7 @@
     "chai": "^4.2.0",
     "docdash": "^1.0.0",
     "dotenv": "^6.1.0",
-    "eslint": "^5.7.0",
+    "eslint": "^5.8.0",
     "eslint-config-airbnb": "^17.1.0",
     "eslint-config-prettier": "^3.1.0",
     "eslint-plugin-import": "^2.14.0",
@@ -30,8 +30,8 @@
     "prettier": "^1.14.3"
   },
   "dependencies": {
-    "base-model-jh": "^1.2.3",
-    "base-util-jh": "^1.1.15",
+    "base-model-jh": "^1.2.4",
+    "base-util-jh": "^1.1.18",
     "bluebird": "^3.5.2",
     "lodash": "^4.17.11"
   }
