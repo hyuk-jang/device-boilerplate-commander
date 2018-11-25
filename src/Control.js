@@ -20,7 +20,7 @@ class Control {
    */
   constructor(config = dsmConfig, dbInfo = config.dbInfo) {
     this.config = config;
-    BU.CLI(dbInfo);
+    // BU.CLI(dbInfo);
 
     this.biModule = new BM(dbInfo);
 

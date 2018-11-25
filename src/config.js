@@ -23,7 +23,14 @@ const config = {
   //     option: Buffer.from([0x04]),
   //   },
   // },
-  inquiryIntervalSecond: 60,
-  inquiryWaitingSecond: 60,
+  inquirySchedulerInfo: {
+    intervalCronFormat: '0 * * * * *',
+    inquiryWaitingSecond: 60,
+    intervalSaveCnt: 1,
+    validInfo: {
+      diffType: 'minutes',
+      duration: 2,
+    },
+  },
 };
 module.exports = config;
