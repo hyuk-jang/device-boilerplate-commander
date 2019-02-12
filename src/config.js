@@ -2,30 +2,34 @@ require('dotenv').config();
 
 const { controllerParserType } = require('../../default-intelligence').dccFlagModel;
 
+const ENV = process.env;
+
 const config = {
-  createSocketServerInfo: {
-    port: process.env.DBC_SOCKET_PORT,
-    wrapperCategory: 'default',
+  projectInfo: {
+    projectMainId: ENV.PJ_MAIN_ID || 'UPSAS',
+    projectSubId: ENV.PJ_SUB_ID || 'muan',
+    featureConfig: {
+      apiConfig: {
+        type: 'socket',
+        host: ENV.PJ_HTTP_HOST,
+        port: ENV.PJ_API_PORT,
+        addConfigInfo: {
+          parser: controllerParserType.socket.DELIMITER,
+          option: '\u0004',
+        },
+      },
+    },
   },
+  /** @type {dbInfo} */
   dbInfo: {
-    port: process.env.WEB_DB_PORT || '3306',
-    host: process.env.WEB_DB_HOST || 'localhost',
-    user: process.env.WEB_DB_USER || 'root',
-    password: process.env.WEB_DB_PW || 'test',
-    database: process.env.WEB_DB_DB || 'test',
+    port: ENV.PJ_DB_PORT || '3306',
+    host: ENV.PJ_DB_HOST || 'localhost',
+    user: ENV.PJ_DB_USER || 'root',
+    password: ENV.PJ_DB_PW || 'test',
+    database: ENV.PJ_DB_DB || 'test',
   },
-  // mainSocketInfo: {
-  //   host: process.env.WEB_HTTP_HOST || 'localhost',
-  //   port: process.env.WEB_SOCKET_PORT,
-  //   type: 'socket',
-  //   addConfigInfo: {
-  //     parser: controllerParserType.socket.DELIMITER,
-  //     option: Buffer.from([0x04]),
-  //   },
-  // },
   inquirySchedulerInfo: {
     intervalCronFormat: '0 * * * * *',
-    inquiryWaitingSecond: 60,
     intervalSaveCnt: 1,
     validInfo: {
       diffType: 'minutes',

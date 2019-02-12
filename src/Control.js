@@ -27,10 +27,17 @@ class Control {
     /** @type {MAIN[]} */
     this.siteList = [];
 
-    /** @type {DBS[]} */
     this.controllerListForDBS = [];
     /** @type {DBP[]} */
     this.controllerListForDBP = [];
+  }
+
+  /** MAIN DB Table을 가지고 오고 seq 순서대로 정렬 */
+  async setMainList() {
+    /** @type {MAIN[]} */
+    const siteList = await this.biModule.getTable('main', { is_deleted: 0 }, false);
+    this.siteList = _.sortBy(siteList, 'main_seq');
+    return this.siteList;
   }
 
   /**
@@ -43,9 +50,13 @@ class Control {
     this.siteList.forEach(mainInfo => {
       const cloneConfig = _.cloneDeep(this.config);
       cloneConfig.uuid = mainInfo.uuid;
-      const controllerDBS = new DBS(cloneConfig);
+
+      const mainDBS = new DBS();
+
+      const controllerDBS = mainDBS.createControl(cloneConfig);
+
       // 해당 DBS Main UUID 정의
-      controllerDBS.mainUUID = mainInfo.uuid;
+      // controllerDBS.mainUUID = mainInfo.uuid;
       this.controllerListForDBS.push(controllerDBS);
     });
 
@@ -54,15 +65,14 @@ class Control {
     await Promise.map(this.controllerListForDBS, controllerDBS =>
       // BU.CLIN(controllerDBS);
       controllerDBS
-        // DBS에 정의된 UUID를 기준으로 DB.main Table UUID를 비교하여 DLC 객체를 생성하기 위한 DL 및 Node 객체 정의
-        .getDataLoggerListByDB()
-        // 관련된 DLC 객체 목록을 생성
-        .then(() => controllerDBS.init())
+        .init()
         // DBS 객체 구동 시작
         .then(() => {
+          BU.CLI('start Program');
+          controllerDBS.runFeature();
+          controllerDBS.inquiryAllDeviceStatus();
           // Main Socket Server 접속 시작
-          controllerDBS.setOptionFeature();
-          controllerDBS.runDeviceInquiryScheduler();
+          // controllerDBS.runDeviceInquiryScheduler();
           // controllerDBS.inquiryAllDeviceStatus();
           Promise.resolve();
         })
@@ -81,14 +91,6 @@ class Control {
     // return this.config;
 
     return this.controllerListForDBS;
-  }
-
-  /** MAIN DB Table을 가지고 오고 seq 순서대로 정렬 */
-  async setMainList() {
-    /** @type {MAIN[]} */
-    const siteList = await this.biModule.getTable('main', { is_deleted: 0 }, false);
-    this.siteList = _.sortBy(siteList, 'main_seq');
-    return this.siteList;
   }
 
   /**

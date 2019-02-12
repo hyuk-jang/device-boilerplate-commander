@@ -14,7 +14,7 @@ if (require !== undefined && require.main === module) {
   controller
     .setMainList()
     .then(() => controller.setControllerListForDBS())
-    .then(() => controller.setControllerListForDBP())
+    // .then(() => controller.setControllerListForDBP())
     .then(dbsList =>
       // BU.CLI(dbsList);
       controller.operationServer(),
