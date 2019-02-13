@@ -5,6 +5,10 @@ const { controllerParserType } = require('../../default-intelligence').dccFlagMo
 const ENV = process.env;
 
 const config = {
+  createSocketServerInfo: {
+    port: ENV.DBC_SOCKET_PORT,
+    wrapperCategory: 'default',
+  },
   projectInfo: {
     projectMainId: ENV.PJ_MAIN_ID || 'UPSAS',
     projectSubId: ENV.PJ_SUB_ID || 'muan',

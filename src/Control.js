@@ -62,17 +62,17 @@ class Control {
 
     // DBS 초기화가 끝날떄까지 기다림
     // this.controllerListDBS 객체 목록 순회
-    await Promise.map(this.controllerListForDBS, controllerDBS =>
+    await Promise.each(this.controllerListForDBS, controllerDBS =>
       // BU.CLIN(controllerDBS);
       controllerDBS
         .init()
         // DBS 객체 구동 시작
         .then(() => {
-          BU.CLI('start Program');
+          // BU.CLI('start Program');
           controllerDBS.runFeature();
-          controllerDBS.inquiryAllDeviceStatus();
+          // controllerDBS.inquiryAllDeviceStatus();
           // Main Socket Server 접속 시작
-          // controllerDBS.runDeviceInquiryScheduler();
+          controllerDBS.runDeviceInquiryScheduler();
           // controllerDBS.inquiryAllDeviceStatus();
           Promise.resolve();
         })
@@ -112,7 +112,7 @@ class Control {
    * Server 구동
    */
   async operationServer() {
-    BU.CLI('operationServer');
+    // BU.CLI('operationServer');
     // Socket Server 정보가 있다면 구동
     if (!_.isEmpty(this.config.createSocketServerInfo)) {
       const socketServer = new SocketServer(this.config.createSocketServerInfo, this.biModule);
