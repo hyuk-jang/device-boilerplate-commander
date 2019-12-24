@@ -50,11 +50,12 @@ class SocketServer {
 
           // 3초안에 인증이 이루어지지 않는다면 해당 접속 해제
           const socketTimer = new CU.Timer(() => {
-            BU.CLI(`${strResUUID} does not exist  `);
+            BU.CLI(`${strResUUID} does not exist ${socket.remoteAddress} `);
             socket.end();
           }, 3000);
 
           socket.on('data', data => {
+            // console.log(data);
             // 인증이 되었기 때문에 socketData는 DCC.Control에서 관리함
             if (hasAuth) return false;
             console.log(`P: ${port} --> Received Data: ${data} `);
@@ -74,6 +75,9 @@ class SocketServer {
               // Timer 해제
               socketTimer.getStateRunning && socketTimer.pause();
               // Bindindg 처리
+
+              _.set(server, 'siteId', strResUUID);
+
               this.dcc.bindingPassiveClient(strResUUID, socket);
             } else {
               // 에러 카운팅 증가
@@ -89,10 +93,12 @@ class SocketServer {
             }
           });
 
-          socket.on('close', () => {});
+          socket.on('close', () => {
+            BU.CLI('socketClient is closed', _.get(server, 'siteId'));
+          });
           socket.on('error', err => {
-            console.error(err);
-            socket.end();
+            BU.CLI(_.get(server, 'siteId'), err);
+            // socket.end();
           });
         } catch (error) {
           BU.logFile(error);
@@ -113,7 +119,8 @@ class SocketServer {
     });
 
     server.on('error', err => {
-      console.error(err);
+      BU.CLI(err);
+      // console.error(err);
     });
   }
 

@@ -36,7 +36,9 @@ class Control {
   async setMainList() {
     /** @type {MAIN[]} */
     const siteList = await this.biModule.getTable('main', { is_deleted: 0 }, false);
-    this.siteList = _.sortBy(siteList, 'main_seq');
+    this.siteList = _(siteList)
+      .reject({ uuid: 'all' })
+      .sortBy('main_seq');
     return this.siteList;
   }
 
@@ -68,12 +70,13 @@ class Control {
         .init()
         // DBS 객체 구동 시작
         .then(() => {
-          // BU.CLI('start Program');
-          controllerDBS.runFeature();
-          // controllerDBS.inquiryAllDeviceStatus();
+          // BU.CLI('start runFeature');
+          return controllerDBS.runFeature();
+        })
+        .then(() => {
           // Main Socket Server 접속 시작
-          controllerDBS.runDeviceInquiryScheduler();
           // controllerDBS.inquiryAllDeviceStatus();
+          controllerDBS.runDeviceInquiryScheduler();
           Promise.resolve();
         })
         .catch(err => {
