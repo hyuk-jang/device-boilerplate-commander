@@ -1,6 +1,10 @@
 require('dotenv').config();
 
-const { controllerParserType } = require('../../default-intelligence').dccFlagModel;
+const { di } = require('./module');
+
+const {
+  dccFlagModel: { controllerParserType },
+} = di;
 
 const ENV = process.env;
 

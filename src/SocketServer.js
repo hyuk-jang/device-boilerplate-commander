@@ -1,12 +1,11 @@
 const _ = require('lodash');
 const { BU, CU } = require('base-util-jh');
-const { BM } = require('base-model-jh');
 
 const net = require('net');
 
-const DCC = require('../../device-client-controller-jh');
+const { DccFacade, dpc } = require('./module');
 
-const { BaseModel } = require('../../device-protocol-converter-jh');
+const { BaseModel } = dpc;
 
 const { createSocketServerInfo } = require('./config');
 
@@ -19,7 +18,7 @@ class SocketServer {
   constructor(config = createSocketServerInfo, biModule) {
     this.config = config;
     this.biModule = biModule;
-    this.dcc = new DCC();
+    this.dcc = new DccFacade();
 
     /** @type {string[]} Site UUID 목록 */
     this.siteUUIDList = [];
@@ -94,7 +93,7 @@ class SocketServer {
           });
 
           socket.on('close', () => {
-            BU.CLI('socketClient is closed', _.get(server, 'siteId'));
+            // BU.CLI('socketClient is closed', _.get(server, 'siteId'));
           });
           socket.on('error', err => {
             BU.CLI(_.get(server, 'siteId'), err);

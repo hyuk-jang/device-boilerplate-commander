@@ -5,10 +5,8 @@ const { BM } = require('base-model-jh');
 const { BU } = require('base-util-jh');
 
 const SocketServer = require('./SocketServer');
-require('../../default-intelligence');
 
-const DBS = require('../../device-boilerplate-sensor');
-const DBP = require('../../device-boilerplate-power');
+const { Dbp, Dbs } = require('./module');
 
 const dsmConfig = require('./config');
 
@@ -53,7 +51,7 @@ class Control {
       const cloneConfig = _.cloneDeep(this.config);
       cloneConfig.uuid = mainInfo.uuid;
 
-      const mainDBS = new DBS();
+      const mainDBS = new Dbs();
 
       const controllerDBS = mainDBS.createControl(cloneConfig);
 
@@ -69,10 +67,10 @@ class Control {
       controllerDBS
         .init()
         // DBS 객체 구동 시작
-        .then(() => {
+        .then(() =>
           // BU.CLI('start runFeature');
-          return controllerDBS.runFeature();
-        })
+          controllerDBS.runFeature(),
+        )
         .then(() => {
           // Main Socket Server 접속 시작
           // controllerDBS.inquiryAllDeviceStatus();
@@ -103,7 +101,7 @@ class Control {
   async setControllerListForDBP() {
     BU.CLI('setControllerListForDBP');
 
-    const dbpController = new DBP(_.cloneDeep(this.config));
+    const dbpController = new Dbp(_.cloneDeep(this.config));
 
     const deviceControllerList = await dbpController.init(this.config.dbInfo);
     dbpController.runDeviceInquiryScheduler();
