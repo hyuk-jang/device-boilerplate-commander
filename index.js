@@ -46,13 +46,13 @@ if (require !== undefined && require.main === module) {
 
   process.on('uncaughtException', err => {
     // BU.debugConsole();
-    BU.CLI(err);
+    BU.CLI(err.message);
     console.log('Node NOT Exiting...');
   });
 
   process.on('unhandledRejection', err => {
     // BU.debugConsole();
-    BU.CLI(err);
+    BU.CLI(err.message);
     console.log('Node NOT Exiting...');
   });
 }

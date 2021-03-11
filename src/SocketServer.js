@@ -32,7 +32,11 @@ class SocketServer {
     };
     const server = net
       .createServer(socket => {
-        console.log(`client is Connected ${port}\naddressInfo: ${socket.remoteAddress}`);
+        // BU.CLIS(`client is Connected ${port}`, `addressInfo: ${socket.remoteAddress}`);
+        console.log(
+          `client is Connected ${port}\taddressInfo: ${socket.remoteAddress}`,
+          new Date().toLocaleString(),
+        );
 
         try {
           // 인증 완료 여부
@@ -48,44 +52,61 @@ class SocketServer {
           socket.write(authMsg);
 
           // 3초안에 인증이 이루어지지 않는다면 해당 접속 해제
-          const socketTimer = new CU.Timer(() => {
-            BU.CLI(`${strResUUID} does not exist ${socket.remoteAddress} `);
+          const socketTimer = setTimeout(() => {
+            BU.CLI(`${socket.remoteAddress} Timeout`);
             socket.end();
           }, 3000);
+
+          // const socketTimer = new CU.Timer(() => {
+          //   BU.CLI(`${socket.remoteAddress} Timeout`);
+          //   socket.end();
+          // }, 5000);
 
           socket.on('data', data => {
             // console.log(data);
             // 인증이 되었기 때문에 socketData는 DCC.Control에서 관리함
             if (hasAuth) return false;
-            console.log(`P: ${port} --> Received Data: ${data} `);
+
+            console.log(
+              `${socket.remoteAddress} --> Received Data: ${data} \t${new Date().toLocaleString()}`,
+            );
 
             bufDataStorage = Buffer.concat([bufDataStorage, data]);
 
-            // 수신받은 데이터 Frame 제거
-            const resUUID = BaseModel.defaultWrapper.peelFrameMsg(protocolInfo, data);
+            try {
+              // 수신받은 데이터 Frame 제거
+              const resUUID = BaseModel.defaultWrapper.peelFrameMsg(protocolInfo, data);
 
-            strResUUID = !_.isUndefined(resUUID) && resUUID.toString();
+              strResUUID = !_.isUndefined(resUUID) && resUUID.toString();
+            } catch (error) {
+              strResUUID = '';
+            }
 
             // BU.CLIS(strResUUID, this.siteUUIDList);
 
             // 해당 Site UUID가 존재한다면 Passive Client 등록
             if (_.includes(this.siteUUIDList, strResUUID)) {
+              console.log(`${socket.remoteAddress} --> 인증 완료`);
               hasAuth = true;
               // Timer 해제
-              socketTimer.getStateRunning && socketTimer.pause();
+              clearTimeout(socketTimer);
+
+              // socketTimer.getStateRunning && socketTimer.pause();
               // Bindindg 처리
 
               _.set(server, 'siteId', strResUUID);
 
               this.dcc.bindingPassiveClient(strResUUID, socket);
             } else {
+              console.error(`${socket.remoteAddress} --> 인증 실패`);
               // 에러 카운팅 증가
               errorCount += 1;
               // Stream 데이터로 인해 데이터의 짤림을 방지하기 위해 기회를 3번 줌
               if (errorCount > 2) {
                 BU.CLI('Auth Code Failed', strResUUID);
                 // Timer 해제
-                socketTimer.getStateRunning && socketTimer.pause();
+                clearTimeout(socketTimer);
+                // socketTimer.getStateRunning && socketTimer.pause();
                 BU.CLI('socket.end');
                 socket.end();
               }
@@ -96,7 +117,7 @@ class SocketServer {
             // BU.CLI('socketClient is closed', _.get(server, 'siteId'));
           });
           socket.on('error', err => {
-            BU.CLI(_.get(server, 'siteId'), err);
+            // BU.CLI(_.get(server, 'siteId'), err);
             // socket.end();
           });
         } catch (error) {
